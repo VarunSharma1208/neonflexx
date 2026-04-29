@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { useSettings } from "@/context/SettingsContext";
+// import { useSettings } from "@/context/SettingsContext";
 
 type FormData = {
   name: string;
@@ -24,7 +24,7 @@ declare global {
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
-  const s = useSettings();
+  // const s = useSettings();
 
   const [form, setForm] = useState<FormData>({
     name: "", email: "", phone: "", address: "", city: "", pincode: "", paymentMethod: "cod",
@@ -43,13 +43,13 @@ export default function CheckoutPage() {
   const discount = appliedCoupon?.discount ?? 0;
   const grandTotal = totalPrice + delivery - discount;
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => { document.body.removeChild(script); };
-  }, []);
+  // useEffect(() => {
+  //   const script = document.createElement("script");
+  //   script.src = "https://checkout.razorpay.com/v1/checkout.js";
+  //   script.async = true;
+  //   document.body.appendChild(script);
+  //   return () => { document.body.removeChild(script); };
+  // }, []);
 
   async function handleApplyCoupon() {
     if (!couponInput.trim()) return;
@@ -131,51 +131,48 @@ export default function CheckoutPage() {
     clearCart();
   }
 
-  async function handleRazorpay() {
-    const createRes = await fetch("/api/payment/create-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: grandTotal }),
-    });
-    const createJson = await createRes.json();
-    if (!createJson.success) return;
-
-    const rzpOrder = createJson.data;
-
-    const options: Record<string, unknown> = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: rzpOrder.amount,
-      currency: "INR",
-      name: `${s.storeName} ${s.storeNameGold}`,
-      order_id: rzpOrder.id,
-      prefill: { name: form.name, email: form.email, contact: form.phone },
-      theme: { color: "#00d4ff" },
-      handler: async (response: {
-        razorpay_order_id: string;
-        razorpay_payment_id: string;
-        razorpay_signature: string;
-      }) => {
-        const verifyRes = await fetch("/api/payment/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            orderData: buildOrderData(),
-          }),
-        });
-        const verifyJson = await verifyRes.json();
-        if (!verifyJson.success) return;
-        setOrderId(verifyJson.data.orderId);
-        setOrderPlaced(true);
-        clearCart();
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  }
+  // async function handleRazorpay() {
+  //   const createRes = await fetch("/api/payment/create-order", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ amount: grandTotal }),
+  //   });
+  //   const createJson = await createRes.json();
+  //   if (!createJson.success) return;
+  //   const rzpOrder = createJson.data;
+  //   const options: Record<string, unknown> = {
+  //     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+  //     amount: rzpOrder.amount,
+  //     currency: "INR",
+  //     name: `${s.storeName} ${s.storeNameGold}`,
+  //     order_id: rzpOrder.id,
+  //     prefill: { name: form.name, email: form.email, contact: form.phone },
+  //     theme: { color: "#00d4ff" },
+  //     handler: async (response: {
+  //       razorpay_order_id: string;
+  //       razorpay_payment_id: string;
+  //       razorpay_signature: string;
+  //     }) => {
+  //       const verifyRes = await fetch("/api/payment/verify", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           razorpay_order_id: response.razorpay_order_id,
+  //           razorpay_payment_id: response.razorpay_payment_id,
+  //           razorpay_signature: response.razorpay_signature,
+  //           orderData: buildOrderData(),
+  //         }),
+  //       });
+  //       const verifyJson = await verifyRes.json();
+  //       if (!verifyJson.success) return;
+  //       setOrderId(verifyJson.data.orderId);
+  //       setOrderPlaced(true);
+  //       clearCart();
+  //     },
+  //   };
+  //   const rzp = new window.Razorpay(options);
+  //   rzp.open();
+  // }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -184,11 +181,12 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
     try {
-      if (form.paymentMethod === "cod") {
-        await handleCOD();
-      } else {
-        await handleRazorpay();
-      }
+      await handleCOD();
+      // if (form.paymentMethod === "cod") {
+      //   await handleCOD();
+      // } else {
+      //   await handleRazorpay();
+      // }
     } finally {
       setSubmitting(false);
     }
@@ -283,28 +281,24 @@ export default function CheckoutPage() {
           {/* Payment */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 className="font-bold text-gray-800 text-lg mb-5">Payment Method</h2>
+            {/* COD only — UPI/Card via Razorpay commented out below */}
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-gold bg-[#e6faff]">
+              <span className="text-2xl">💵</span>
+              <div>
+                <p className="font-semibold text-gray-800 text-sm">Cash on Delivery</p>
+                <p className="text-xs text-gray-400">Pay when your order arrives</p>
+              </div>
+            </div>
+
+            {/* Razorpay options — uncomment when keys are ready
             <div className="space-y-3">
               {([
                 { value: "cod",  label: "Cash on Delivery", sub: "Pay when your order arrives", icon: "💵" },
                 { value: "upi",  label: "UPI / Google Pay / PhonePe", sub: "Instant payment via Razorpay", icon: "📱" },
                 { value: "card", label: "Credit / Debit Card", sub: "Visa, Mastercard, RuPay via Razorpay", icon: "💳" },
               ] as const).map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
-                    form.paymentMethod === opt.value
-                      ? "border-gold bg-[#e6faff]"
-                      : "border-gray-200 hover:border-gold/50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value={opt.value}
-                    checked={form.paymentMethod === opt.value}
-                    onChange={handleChange}
-                    className="accent-gold"
-                  />
+                <label key={opt.value} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${form.paymentMethod === opt.value ? "border-gold bg-[#e6faff]" : "border-gray-200 hover:border-gold/50"}`}>
+                  <input type="radio" name="paymentMethod" value={opt.value} checked={form.paymentMethod === opt.value} onChange={handleChange} className="accent-gold" />
                   <span className="text-xl">{opt.icon}</span>
                   <div>
                     <p className="font-semibold text-gray-800 text-sm">{opt.label}</p>
@@ -313,15 +307,12 @@ export default function CheckoutPage() {
                 </label>
               ))}
             </div>
-
             {(form.paymentMethod === "upi" || form.paymentMethod === "card") && (
               <div className="mt-4 flex items-center gap-2 bg-[#e6faff] border border-[#b3f6ff] rounded-lg px-4 py-3">
-                <svg className="w-4 h-4 gold-text shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
                 <p className="text-xs text-gray-600">Secured by <span className="font-bold gold-text">Razorpay</span> — 100% safe &amp; encrypted</p>
               </div>
             )}
+            */}
           </div>
 
           <button
@@ -329,11 +320,7 @@ export default function CheckoutPage() {
             disabled={submitting}
             className="w-full btn-gold py-4 rounded-xl font-bold text-base disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {submitting
-              ? "Processing..."
-              : form.paymentMethod === "cod"
-              ? `Place Order — ₹${grandTotal.toLocaleString()}`
-              : `Pay ₹${grandTotal.toLocaleString()} via Razorpay`}
+            {submitting ? "Placing Order..." : `Place Order — ₹${grandTotal.toLocaleString()}`}
           </button>
         </form>
 
