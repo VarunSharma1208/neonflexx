@@ -211,7 +211,7 @@ export default function AdminDashboard() {
                   </Pie>
                   <Tooltip
                     contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e5e7eb" }}
-                    formatter={(v: number, n: string) => [v, n.charAt(0).toUpperCase() + n.slice(1)]}
+                    formatter={(v, n) => [v, String(n).charAt(0).toUpperCase() + String(n).slice(1)]}
                   />
                   <Legend
                     iconType="circle"
