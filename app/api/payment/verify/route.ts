@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import dbConnect from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 import OrderModel from "@/lib/models/Order";
 
 export async function POST(req: NextRequest) {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  await dbConnect();
+  await connectDB();
 
   const orderId = `ORD-${Date.now()}`;
   const order = await OrderModel.create({
