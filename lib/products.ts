@@ -2,6 +2,7 @@ import { Product } from "@/types";
 
 export const products: Product[] = [
   {
+    _id: "1",
     id: 1,
     name: "Premium Wireless Headphones",
     price: 2999,
@@ -15,6 +16,7 @@ export const products: Product[] = [
     badge: "Sale",
   },
   {
+    _id: "2",
     id: 2,
     name: "Men's Casual Sneakers",
     price: 1499,
@@ -28,6 +30,7 @@ export const products: Product[] = [
     badge: "Sale",
   },
   {
+    _id: "3",
     id: 3,
     name: "Stainless Steel Water Bottle",
     price: 599,
@@ -40,6 +43,7 @@ export const products: Product[] = [
     badge: "Bestseller",
   },
   {
+    _id: "4",
     id: 4,
     name: "Smart Watch Pro",
     price: 7999,
@@ -53,6 +57,7 @@ export const products: Product[] = [
     badge: "Hot",
   },
   {
+    _id: "5",
     id: 5,
     name: "Leather Crossbody Bag",
     price: 1899,
@@ -64,6 +69,7 @@ export const products: Product[] = [
     stock: 20,
   },
   {
+    _id: "6",
     id: 6,
     name: "Yoga Mat Premium",
     price: 899,
@@ -77,6 +83,7 @@ export const products: Product[] = [
     badge: "New",
   },
   {
+    _id: "7",
     id: 7,
     name: "Bluetooth Speaker",
     price: 1599,
@@ -88,6 +95,7 @@ export const products: Product[] = [
     stock: 18,
   },
   {
+    _id: "8",
     id: 8,
     name: "Sunglasses UV400",
     price: 799,
