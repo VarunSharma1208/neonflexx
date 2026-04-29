@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "lightningcss-darwin-arm64": "^1.32.0",
     "mongoose": "^9.4.1",
     "next": "16.2.4",
     "razorpay": "^2.9.6",
