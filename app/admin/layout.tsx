@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 const navLinks = [
   {
@@ -69,6 +70,68 @@ const navLinks = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [authed, setAuthed] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("admin_auth") === "1") setAuthed(true);
+  }, []);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        sessionStorage.setItem("admin_auth", "1");
+        setAuthed(true);
+      } else {
+        setError("Wrong password. Try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!authed) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+        <div className="bg-[#1a1a1a] rounded-2xl border border-white/10 p-8 w-full max-w-sm">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold mb-1">Proton</p>
+          <h1 className="text-xl font-bold text-white mb-6">Admin Login</h1>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                placeholder="Enter admin password"
+                autoFocus
+                className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold transition-colors placeholder:text-gray-600"
+              />
+              {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+            </div>
+            <button
+              type="submit"
+              disabled={loading || !password}
+              className="w-full btn-gold py-3 rounded-xl font-bold text-sm disabled:opacity-50"
+            >
+              {loading ? "Checking..." : "Login"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -100,7 +163,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="px-3 py-4 border-t border-white/10">
+        <div className="px-3 py-4 border-t border-white/10 space-y-1">
           <Link
             href="/"
             className="flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
@@ -111,6 +174,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </svg>
             Back to Store
           </Link>
+          <button
+            onClick={() => { sessionStorage.removeItem("admin_auth"); setAuthed(false); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Logout
+          </button>
         </div>
       </aside>
 
