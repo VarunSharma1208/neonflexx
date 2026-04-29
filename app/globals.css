@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --gold: #00d4ff;
+  --gold-dark: #009abf;
+  --gold-light: #b3f6ff;
+  --neon-pink: #ff0080;
+  --dark-bg: #0a0a0a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-light: var(--gold-light);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
 }
+
+.gold-text { color: var(--gold); }
+.gold-bg { background-color: var(--gold); }
+.gold-border { border-color: var(--gold); }
+
+.btn-gold {
+  background-color: var(--gold);
+  color: #000;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.btn-gold:hover {
+  background-color: var(--gold-dark);
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.45);
+}
+
+.neon-glow {
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.8), 0 0 28px rgba(0, 212, 255, 0.4);
+}
+
+.neon-pink-text { color: var(--neon-pink); }
