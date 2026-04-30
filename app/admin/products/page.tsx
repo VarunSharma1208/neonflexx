@@ -9,6 +9,7 @@ const EMPTY_FORM = {
   price: "",
   originalPrice: "",
   image: "",
+  images: [""],
   category: "",
   rating: "4",
   reviews: "0",
@@ -58,6 +59,7 @@ export default function AdminProductsPage() {
       price: String(p.price),
       originalPrice: p.originalPrice ? String(p.originalPrice) : "",
       image: p.image,
+      images: p.images && p.images.length > 0 ? p.images : [""],
       category: p.category,
       rating: String(p.rating),
       reviews: String(p.reviews),
@@ -71,11 +73,13 @@ export default function AdminProductsPage() {
   async function handleSave() {
     setSaving(true);
     try {
+      const cleanImages = form.images.filter((u) => u.trim() !== "");
       const payload = {
         name: form.name,
         price: Number(form.price),
         originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined,
-        image: form.image,
+        image: cleanImages[0] || form.image,
+        images: cleanImages,
         category: form.category,
         rating: Number(form.rating),
         reviews: Number(form.reviews),
@@ -290,9 +294,41 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="col-span-2">
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Image URL *</label>
-                <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold" />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-gray-600">Images (URLs) * — first image is the main one</label>
+                  <button type="button"
+                    onClick={() => setForm({ ...form, images: [...form.images, ""] })}
+                    className="text-xs text-gold font-semibold hover:underline">
+                    + Add Image
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {form.images.map((url, i) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <input
+                        value={url}
+                        onChange={(e) => {
+                          const updated = [...form.images];
+                          updated[i] = e.target.value;
+                          setForm({ ...form, images: updated });
+                        }}
+                        placeholder={i === 0 ? "Main image URL *" : `Image ${i + 1} URL`}
+                        className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold"
+                      />
+                      {url && (
+                        <div className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden shrink-0 bg-gray-50">
+                          <Image src={url} alt="" fill className="object-cover" sizes="40px"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                        </div>
+                      )}
+                      {form.images.length > 1 && (
+                        <button type="button"
+                          onClick={() => setForm({ ...form, images: form.images.filter((_, j) => j !== i) })}
+                          className="text-red-400 hover:text-red-600 shrink-0 text-lg leading-none">×</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="col-span-2">

@@ -35,6 +35,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound404, setNotFound404] = useState(false);
+  const [activeImg, setActiveImg] = useState(0);
 
   useEffect(() => {
     async function fetchProduct() {
@@ -93,20 +94,39 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="grid md:grid-cols-2 gap-0">
-          {/* Image */}
-          <div className="relative h-72 md:h-auto md:min-h-96 bg-gray-50">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
-            {product.badge && (
-              <span className="absolute top-4 left-4 bg-indigo-600 text-white text-sm font-bold px-3 py-1 rounded-full">
-                {product.badge}
-              </span>
+          {/* Image Gallery */}
+          <div className="flex flex-col gap-3 p-4 bg-gray-50">
+            {/* Main image */}
+            <div className="relative h-72 md:h-96 rounded-xl overflow-hidden bg-white">
+              <Image
+                src={(product.images && product.images.length > 0 ? product.images[activeImg] : product.image)}
+                alt={product.name}
+                fill
+                className="object-cover transition-all duration-300"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+              {product.badge && (
+                <span className="absolute top-4 left-4 bg-gold text-black text-sm font-bold px-3 py-1 rounded-full">
+                  {product.badge}
+                </span>
+              )}
+            </div>
+            {/* Thumbnails — only show if more than 1 image */}
+            {product.images && product.images.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {product.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(i)}
+                    className={`relative w-16 h-16 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
+                      activeImg === i ? "border-gold" : "border-transparent opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="64px" />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
