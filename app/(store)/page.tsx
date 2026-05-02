@@ -116,7 +116,7 @@ function HomeContent() {
 
       {/* Certifications bar */}
       {s.certifications.length > 0 && (
-        <div className="bg-[#e6faff] border-b border-[#b3f6ff] py-3">
+        <div className="bg-[#fff0f0] border-b border-[#ffd0d0] py-3">
           <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center gap-8 text-xs font-semibold text-gray-600 uppercase tracking-widest">
             {s.certifications.map((c) => (
               <span key={c} className="flex items-center gap-1">
@@ -156,7 +156,7 @@ function HomeContent() {
                 onClick={() => { setSelectedSubcategory(selectedSubcategory === sub ? "" : sub); setSelectedTargetArea(""); }}
                 className={`px-3 py-1.5 rounded text-xs font-semibold border transition-all ${
                   selectedSubcategory === sub
-                    ? "bg-[#0d2233] text-white border-transparent"
+                    ? "bg-[#0a0a0a] text-white border-transparent"
                     : "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800"
                 }`}
               >

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useSettings } from "@/context/SettingsContext";
@@ -41,9 +42,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <span className="text-2xl font-black tracking-tight text-[#0d2233]">
-                {settings.storeName} <span className="gold-text">{settings.storeNameGold}</span>
-              </span>
+              <Image src="/logo.png" alt={settings.storeName} width={140} height={56} className="h-12 w-auto object-contain" priority />
             </Link>
 
             {/* Desktop nav */}

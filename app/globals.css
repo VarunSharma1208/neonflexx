@@ -1,10 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --gold: #00d4ff;
-  --gold-dark: #009abf;
-  --gold-light: #b3f6ff;
-  --neon-pink: #ff0080;
+  --gold: #cc1111;
+  --gold-dark: #aa0e0e;
+  --gold-light: #ffd5d5;
   --dark-bg: #0a0a0a;
 }
 
@@ -26,18 +25,16 @@ body {
 
 .btn-gold {
   background-color: var(--gold);
-  color: #000;
+  color: #ffffff;
   font-weight: 700;
   letter-spacing: 0.05em;
   transition: background-color 0.2s, box-shadow 0.2s;
 }
 .btn-gold:hover {
   background-color: var(--gold-dark);
-  box-shadow: 0 0 18px rgba(0, 212, 255, 0.45);
+  box-shadow: 0 0 18px rgba(204, 17, 17, 0.5);
 }
 
 .neon-glow {
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.8), 0 0 28px rgba(0, 212, 255, 0.4);
+  text-shadow: 0 0 10px rgba(204, 17, 17, 0.8), 0 0 28px rgba(204, 17, 17, 0.4);
 }
-
-.neon-pink-text { color: var(--neon-pink); }

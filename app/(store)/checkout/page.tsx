@@ -282,7 +282,7 @@ export default function CheckoutPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 className="font-bold text-gray-800 text-lg mb-5">Payment Method</h2>
             {/* COD only — UPI/Card via Razorpay commented out below */}
-            <div className="flex items-center gap-3 p-4 rounded-xl border border-gold bg-[#e6faff]">
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-gold bg-[#fff0f0]">
               <span className="text-2xl">💵</span>
               <div>
                 <p className="font-semibold text-gray-800 text-sm">Cash on Delivery</p>
@@ -297,7 +297,7 @@ export default function CheckoutPage() {
                 { value: "upi",  label: "UPI / Google Pay / PhonePe", sub: "Instant payment via Razorpay", icon: "📱" },
                 { value: "card", label: "Credit / Debit Card", sub: "Visa, Mastercard, RuPay via Razorpay", icon: "💳" },
               ] as const).map((opt) => (
-                <label key={opt.value} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${form.paymentMethod === opt.value ? "border-gold bg-[#e6faff]" : "border-gray-200 hover:border-gold/50"}`}>
+                <label key={opt.value} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${form.paymentMethod === opt.value ? "border-gold bg-[#fff0f0]" : "border-gray-200 hover:border-gold/50"}`}>
                   <input type="radio" name="paymentMethod" value={opt.value} checked={form.paymentMethod === opt.value} onChange={handleChange} className="accent-gold" />
                   <span className="text-xl">{opt.icon}</span>
                   <div>
@@ -308,7 +308,7 @@ export default function CheckoutPage() {
               ))}
             </div>
             {(form.paymentMethod === "upi" || form.paymentMethod === "card") && (
-              <div className="mt-4 flex items-center gap-2 bg-[#e6faff] border border-[#b3f6ff] rounded-lg px-4 py-3">
+              <div className="mt-4 flex items-center gap-2 bg-[#fff0f0] border border-[#ffd0d0] rounded-lg px-4 py-3">
                 <p className="text-xs text-gray-600">Secured by <span className="font-bold gold-text">Razorpay</span> — 100% safe &amp; encrypted</p>
               </div>
             )}
