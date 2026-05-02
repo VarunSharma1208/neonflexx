@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Product } from "@/types";
-import { getSubcategories, getTargetAreas } from "@/lib/subcategories";
+
+type CategoryTree = Record<string, Record<string, string[]>>;
 
 const EMPTY_FORM = {
   name: "",
@@ -21,11 +22,6 @@ const EMPTY_FORM = {
   badge: "",
 };
 
-const categories = [
-  "Treadmills", "Ellipticals", "Upright Bikes", "Recumbent Bikes",
-  "Strength", "Home Range", "Accessories",
-];
-
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +31,7 @@ export default function AdminProductsPage() {
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [categoryTree, setCategoryTree] = useState<CategoryTree>({});
 
   async function fetchProducts() {
     try {
@@ -47,7 +44,12 @@ export default function AdminProductsPage() {
     }
   }
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => {
+    fetchProducts();
+    fetch("/api/admin/categories")
+      .then((r) => r.json())
+      .then((j) => { if (j.success) setCategoryTree(j.data); });
+  }, []);
 
   function openAdd() {
     setEditing(null);
@@ -276,11 +278,11 @@ export default function AdminProductsPage() {
                   onChange={(e) => setForm({ ...form, category: e.target.value, subcategory: "", targetArea: "" })}
                   className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold">
                   <option value="">Select category</option>
-                  {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+                  {Object.keys(categoryTree).map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
 
-              {getSubcategories(form.category).length > 0 && (
+              {Object.keys(categoryTree[form.category] ?? {}).length > 0 && (
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Subcategory</label>
                   <select
@@ -288,12 +290,12 @@ export default function AdminProductsPage() {
                     onChange={(e) => setForm({ ...form, subcategory: e.target.value, targetArea: "" })}
                     className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold">
                     <option value="">Select subcategory</option>
-                    {getSubcategories(form.category).map((s) => <option key={s} value={s}>{s}</option>)}
+                    {Object.keys(categoryTree[form.category] ?? {}).map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
               )}
 
-              {getTargetAreas(form.category, form.subcategory).length > 0 && (
+              {(categoryTree[form.category]?.[form.subcategory] ?? []).length > 0 && (
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Target Area</label>
                   <select
@@ -301,7 +303,7 @@ export default function AdminProductsPage() {
                     onChange={(e) => setForm({ ...form, targetArea: e.target.value })}
                     className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold">
                     <option value="">Select target area</option>
-                    {getTargetAreas(form.category, form.subcategory).map((t) => <option key={t} value={t}>{t}</option>)}
+                    {(categoryTree[form.category]?.[form.subcategory] ?? []).map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
               )}

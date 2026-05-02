@@ -24,14 +24,25 @@ function HomeContent() {
   const [selectedCategory, setSelectedCategory] = useState(
     categories.includes(initialCategory) ? initialCategory : "All"
   );
+  const [selectedSubcategory, setSelectedSubcategory] = useState(searchParams.get("subcategory") ?? "");
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categoryTree, setCategoryTree] = useState<Record<string, Record<string, string[]>>>({});
+
+  useEffect(() => {
+    fetch("/api/admin/categories")
+      .then((r) => r.json())
+      .then((json) => { if (json.success) setCategoryTree(json.data); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const cats = ["All", ...s.categories];
     const cat = searchParams.get("category") ?? "All";
+    const sub = searchParams.get("subcategory") ?? "";
     if (cats.includes(cat)) setSelectedCategory(cat);
+    setSelectedSubcategory(sub);
   }, [searchParams, s.categories]);
 
   useEffect(() => {
@@ -48,13 +59,18 @@ function HomeContent() {
     fetchProducts();
   }, []);
 
+  const subcategories = selectedCategory !== "All" && categoryTree[selectedCategory]
+    ? Object.keys(categoryTree[selectedCategory])
+    : [];
+
   const filtered = useMemo(() => {
     return products.filter((p) => {
       const matchCategory = selectedCategory === "All" || p.category === selectedCategory;
+      const matchSubcategory = !selectedSubcategory || p.subcategory === selectedSubcategory;
       const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCategory && matchSearch;
+      return matchCategory && matchSubcategory && matchSearch;
     });
-  }, [products, selectedCategory, searchQuery]);
+  }, [products, selectedCategory, selectedSubcategory, searchQuery]);
 
   const hero = selectedCategory !== "All" ? categoryHero[selectedCategory] : null;
 
@@ -107,11 +123,11 @@ function HomeContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* Category pills */}
-        <div className="flex gap-2 flex-wrap mb-8">
+        <div className="flex gap-2 flex-wrap mb-4">
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setSelectedCategory(cat)}
+              onClick={() => { setSelectedCategory(cat); setSelectedSubcategory(""); }}
               className={`px-4 py-2 rounded text-sm font-semibold border transition-all ${
                 selectedCategory === cat
                   ? "gold-bg text-white border-transparent"
@@ -122,6 +138,25 @@ function HomeContent() {
             </button>
           ))}
         </div>
+
+        {/* Subcategory pills */}
+        {subcategories.length > 0 && (
+          <div className="flex gap-2 flex-wrap mb-8">
+            {subcategories.map((sub) => (
+              <button
+                key={sub}
+                onClick={() => setSelectedSubcategory(selectedSubcategory === sub ? "" : sub)}
+                className={`px-3 py-1.5 rounded text-xs font-semibold border transition-all ${
+                  selectedSubcategory === sub
+                    ? "bg-[#0d2233] text-white border-transparent"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800"
+                }`}
+              >
+                {sub}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Search */}
         <div className="relative max-w-md mb-8">
