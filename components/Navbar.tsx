@@ -42,7 +42,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/logo.png" alt={settings.storeName} width={140} height={56} className="h-12 w-auto object-contain" priority />
+              <Image src="/logo.png" alt={settings.storeName} width={180} height={72} className="h-16 w-auto object-contain" priority />
             </Link>
 
             {/* Desktop nav */}
