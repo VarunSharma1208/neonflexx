@@ -12,6 +12,7 @@ export default function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
+  const [expandedMobileSub, setExpandedMobileSub] = useState<string | null>(null);
   const [categoryTree, setCategoryTree] = useState<Record<string, Record<string, string[]>>>({});
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function Navbar() {
   const navLinks = settings.categories.map((cat) => ({
     label: cat,
     href: `/?category=${encodeURIComponent(cat)}`,
-    subcategories: categoryTree[cat] ? Object.keys(categoryTree[cat]) : [],
+    tree: categoryTree[cat] ?? {},
   }));
 
   return (
@@ -47,40 +48,56 @@ export default function Navbar() {
 
             {/* Desktop nav */}
             <div className="hidden lg:flex items-center gap-1 text-sm font-semibold text-gray-700">
-              {navLinks.map((l) => (
-                <div key={l.label} className="relative group">
-                  <Link
-                    href={l.href}
-                    className="flex items-center gap-1 px-3 py-2 rounded hover:text-gold transition-colors whitespace-nowrap"
-                  >
-                    {l.label}
-                    {l.subcategories.length > 0 && (
-                      <svg
-                        className="w-3 h-3 mt-0.5 transition-transform group-hover:rotate-180"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    )}
-                  </Link>
+              {navLinks.map((l) => {
+                const hasSubs = Object.keys(l.tree).length > 0;
+                return (
+                  <div key={l.label} className="relative group">
+                    <Link
+                      href={l.href}
+                      className="flex items-center gap-1 px-3 py-2 rounded hover:text-gold transition-colors whitespace-nowrap"
+                    >
+                      {l.label}
+                      {hasSubs && (
+                        <svg
+                          className="w-3 h-3 mt-0.5 transition-transform group-hover:rotate-180"
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      )}
+                    </Link>
 
-                  {l.subcategories.length > 0 && (
-                    <div className="absolute top-full left-0 z-50 pt-1 min-w-[200px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150">
-                      <div className="bg-white border border-gray-200 rounded shadow-lg py-1">
-                        {l.subcategories.map((sub) => (
-                          <Link
-                            key={sub}
-                            href={`/?category=${encodeURIComponent(l.label)}&subcategory=${encodeURIComponent(sub)}`}
-                            className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gold transition-colors whitespace-nowrap"
-                          >
-                            {sub}
-                          </Link>
-                        ))}
+                    {hasSubs && (
+                      <div className="absolute top-full left-0 z-50 pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150">
+                        <div className="bg-white border border-gray-200 rounded-lg shadow-xl p-5 flex gap-8 min-w-max">
+                          {Object.entries(l.tree).map(([sub, areas]) => (
+                            <div key={sub} className="min-w-[120px]">
+                              <Link
+                                href={`/?category=${encodeURIComponent(l.label)}&subcategory=${encodeURIComponent(sub)}`}
+                                className="block text-xs font-bold text-gray-900 uppercase tracking-wider hover:text-gold transition-colors"
+                              >
+                                {sub}
+                              </Link>
+                              <div className="w-6 h-0.5 gold-bg mt-1.5 mb-2" />
+                              <div className="space-y-1.5">
+                                {areas.map((area) => (
+                                  <Link
+                                    key={area}
+                                    href={`/?category=${encodeURIComponent(l.label)}&subcategory=${encodeURIComponent(sub)}&targetArea=${encodeURIComponent(area)}`}
+                                    className="block text-sm text-gray-500 hover:text-gold transition-colors whitespace-nowrap"
+                                  >
+                                    {area}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Right icons */}
@@ -121,47 +138,84 @@ export default function Navbar() {
         {/* Mobile menu */}
         {mobileOpen && (
           <div className="lg:hidden border-t border-gray-100 bg-white px-4 pb-4 space-y-1">
-            {navLinks.map((l) => (
-              <div key={l.label}>
-                <div className="flex items-center justify-between">
-                  <Link
-                    href={l.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="py-2 text-sm font-semibold text-gray-700 hover:text-gold transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                  {l.subcategories.length > 0 && (
-                    <button
-                      onClick={() => setExpandedMobile(expandedMobile === l.label ? null : l.label)}
-                      className="p-1 text-gray-500"
+            {navLinks.map((l) => {
+              const subs = Object.entries(l.tree);
+              return (
+                <div key={l.label}>
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href={l.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="py-2 text-sm font-semibold text-gray-700 hover:text-gold transition-colors"
                     >
-                      <svg
-                        className={`w-4 h-4 transition-transform ${expandedMobile === l.label ? "rotate-180" : ""}`}
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                      {l.label}
+                    </Link>
+                    {subs.length > 0 && (
+                      <button
+                        onClick={() => {
+                          setExpandedMobile(expandedMobile === l.label ? null : l.label);
+                          setExpandedMobileSub(null);
+                        }}
+                        className="p-1 text-gray-500"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
+                        <svg
+                          className={`w-4 h-4 transition-transform ${expandedMobile === l.label ? "rotate-180" : ""}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+
+                  {expandedMobile === l.label && (
+                    <div className="pl-3 pb-2 space-y-0.5 border-l-2 border-gold/30 ml-2">
+                      {subs.map(([sub, areas]) => (
+                        <div key={sub}>
+                          <div className="flex items-center justify-between">
+                            <Link
+                              href={`/?category=${encodeURIComponent(l.label)}&subcategory=${encodeURIComponent(sub)}`}
+                              onClick={() => setMobileOpen(false)}
+                              className="py-1.5 text-sm font-semibold text-gray-700 hover:text-gold transition-colors"
+                            >
+                              {sub}
+                            </Link>
+                            {areas.length > 0 && (
+                              <button
+                                onClick={() => setExpandedMobileSub(expandedMobileSub === sub ? null : sub)}
+                                className="p-1 text-gray-400"
+                              >
+                                <svg
+                                  className={`w-3.5 h-3.5 transition-transform ${expandedMobileSub === sub ? "rotate-180" : ""}`}
+                                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+
+                          {expandedMobileSub === sub && areas.length > 0 && (
+                            <div className="pl-3 pb-1 space-y-1 border-l border-gray-200 ml-1">
+                              {areas.map((area) => (
+                                <Link
+                                  key={area}
+                                  href={`/?category=${encodeURIComponent(l.label)}&subcategory=${encodeURIComponent(sub)}&targetArea=${encodeURIComponent(area)}`}
+                                  onClick={() => setMobileOpen(false)}
+                                  className="block py-1 text-xs text-gray-500 hover:text-gold transition-colors"
+                                >
+                                  {area}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-
-                {l.subcategories.length > 0 && expandedMobile === l.label && (
-                  <div className="pl-4 pb-2 space-y-1">
-                    {l.subcategories.map((sub) => (
-                      <Link
-                        key={sub}
-                        href={`/?category=${encodeURIComponent(l.label)}&subcategory=${encodeURIComponent(sub)}`}
-                        onClick={() => setMobileOpen(false)}
-                        className="block py-1.5 text-sm text-gray-600 hover:text-gold transition-colors"
-                      >
-                        {sub}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </nav>

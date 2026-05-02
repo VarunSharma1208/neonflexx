@@ -25,6 +25,7 @@ function HomeContent() {
     categories.includes(initialCategory) ? initialCategory : "All"
   );
   const [selectedSubcategory, setSelectedSubcategory] = useState(searchParams.get("subcategory") ?? "");
+  const [selectedTargetArea, setSelectedTargetArea] = useState(searchParams.get("targetArea") ?? "");
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,8 +42,10 @@ function HomeContent() {
     const cats = ["All", ...s.categories];
     const cat = searchParams.get("category") ?? "All";
     const sub = searchParams.get("subcategory") ?? "";
+    const area = searchParams.get("targetArea") ?? "";
     if (cats.includes(cat)) setSelectedCategory(cat);
     setSelectedSubcategory(sub);
+    setSelectedTargetArea(area);
   }, [searchParams, s.categories]);
 
   useEffect(() => {
@@ -63,14 +66,19 @@ function HomeContent() {
     ? Object.keys(categoryTree[selectedCategory])
     : [];
 
+  const targetAreas = selectedCategory !== "All" && selectedSubcategory && categoryTree[selectedCategory]?.[selectedSubcategory]
+    ? categoryTree[selectedCategory][selectedSubcategory]
+    : [];
+
   const filtered = useMemo(() => {
     return products.filter((p) => {
       const matchCategory = selectedCategory === "All" || p.category === selectedCategory;
       const matchSubcategory = !selectedSubcategory || p.subcategory === selectedSubcategory;
+      const matchTargetArea = !selectedTargetArea || p.targetArea === selectedTargetArea;
       const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCategory && matchSubcategory && matchSearch;
+      return matchCategory && matchSubcategory && matchTargetArea && matchSearch;
     });
-  }, [products, selectedCategory, selectedSubcategory, searchQuery]);
+  }, [products, selectedCategory, selectedSubcategory, selectedTargetArea, searchQuery]);
 
   const hero = selectedCategory !== "All" ? categoryHero[selectedCategory] : null;
 
@@ -127,7 +135,7 @@ function HomeContent() {
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => { setSelectedCategory(cat); setSelectedSubcategory(""); }}
+              onClick={() => { setSelectedCategory(cat); setSelectedSubcategory(""); setSelectedTargetArea(""); }}
               className={`px-4 py-2 rounded text-sm font-semibold border transition-all ${
                 selectedCategory === cat
                   ? "gold-bg text-white border-transparent"
@@ -141,11 +149,11 @@ function HomeContent() {
 
         {/* Subcategory pills */}
         {subcategories.length > 0 && (
-          <div className="flex gap-2 flex-wrap mb-8">
+          <div className="flex gap-2 flex-wrap mb-3">
             {subcategories.map((sub) => (
               <button
                 key={sub}
-                onClick={() => setSelectedSubcategory(selectedSubcategory === sub ? "" : sub)}
+                onClick={() => { setSelectedSubcategory(selectedSubcategory === sub ? "" : sub); setSelectedTargetArea(""); }}
                 className={`px-3 py-1.5 rounded text-xs font-semibold border transition-all ${
                   selectedSubcategory === sub
                     ? "bg-[#0d2233] text-white border-transparent"
@@ -153,6 +161,25 @@ function HomeContent() {
                 }`}
               >
                 {sub}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Target area pills */}
+        {targetAreas.length > 0 && (
+          <div className="flex gap-2 flex-wrap mb-8">
+            {targetAreas.map((area) => (
+              <button
+                key={area}
+                onClick={() => setSelectedTargetArea(selectedTargetArea === area ? "" : area)}
+                className={`px-3 py-1 rounded text-xs font-medium border transition-all ${
+                  selectedTargetArea === area
+                    ? "gold-bg text-white border-transparent"
+                    : "bg-white text-gray-500 border-gray-200 hover:border-gold hover:text-gold"
+                }`}
+              >
+                {area}
               </button>
             ))}
           </div>
