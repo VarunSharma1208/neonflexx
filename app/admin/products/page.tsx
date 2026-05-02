@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Product } from "@/types";
+import { getSubcategories, getTargetAreas } from "@/lib/subcategories";
 
 const EMPTY_FORM = {
   name: "",
@@ -11,6 +12,8 @@ const EMPTY_FORM = {
   image: "",
   images: [""],
   category: "",
+  subcategory: "",
+  targetArea: "",
   rating: "4",
   reviews: "0",
   description: "",
@@ -61,6 +64,8 @@ export default function AdminProductsPage() {
       image: p.image,
       images: p.images && p.images.length > 0 ? p.images : [""],
       category: p.category,
+      subcategory: p.subcategory ?? "",
+      targetArea: p.targetArea ?? "",
       rating: String(p.rating),
       reviews: String(p.reviews),
       description: p.description,
@@ -81,6 +86,8 @@ export default function AdminProductsPage() {
         image: cleanImages[0] || form.image,
         images: cleanImages,
         category: form.category,
+        subcategory: form.subcategory || undefined,
+        targetArea: form.targetArea || undefined,
         rating: Number(form.rating),
         reviews: Number(form.reviews),
         description: form.description,
@@ -186,7 +193,11 @@ export default function AdminProductsPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{p.category}</td>
+                    <td className="px-4 py-3 text-gray-600">
+                      <span>{p.category}</span>
+                      {p.subcategory && <span className="text-gray-400"> › {p.subcategory}</span>}
+                      {p.targetArea && <span className="text-gray-400"> › {p.targetArea}</span>}
+                    </td>
                     <td className="px-4 py-3">
                       <p className="font-semibold text-gray-800">₹{p.price.toLocaleString("en-IN")}</p>
                       {p.originalPrice && (
@@ -260,12 +271,40 @@ export default function AdminProductsPage() {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Category *</label>
-                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value, subcategory: "", targetArea: "" })}
                   className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold">
                   <option value="">Select category</option>
                   {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
+
+              {getSubcategories(form.category).length > 0 && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Subcategory</label>
+                  <select
+                    value={form.subcategory}
+                    onChange={(e) => setForm({ ...form, subcategory: e.target.value, targetArea: "" })}
+                    className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold">
+                    <option value="">Select subcategory</option>
+                    {getSubcategories(form.category).map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {getTargetAreas(form.category, form.subcategory).length > 0 && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Target Area</label>
+                  <select
+                    value={form.targetArea}
+                    onChange={(e) => setForm({ ...form, targetArea: e.target.value })}
+                    className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold">
+                    <option value="">Select target area</option>
+                    {getTargetAreas(form.category, form.subcategory).map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Stock *</label>
