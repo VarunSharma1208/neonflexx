@@ -7,6 +7,8 @@ export interface IProduct extends Document {
   image: string;
   images?: string[];
   category: string;
+  subcategory?: string;
+  targetArea?: string;
   rating: number;
   reviews: number;
   description: string;
@@ -22,6 +24,8 @@ const ProductSchema = new Schema<IProduct>(
     image: { type: String, required: true },
     images: { type: [String], default: [] },
     category: { type: String, required: true },
+    subcategory: { type: String },
+    targetArea: { type: String },
     rating: { type: Number, required: true, min: 0, max: 5 },
     reviews: { type: Number, required: true, default: 0 },
     description: { type: String, required: true },
