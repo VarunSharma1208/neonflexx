@@ -33,17 +33,19 @@ export default function Navbar() {
 
       <nav className="bg-[#080808] border-b border-[rgba(0,212,255,0.15)] sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-48">
 
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0">
               <Image
                 src={settings.logoUrl || "/logo.png"}
                 alt={`${settings.storeName} ${settings.storeNameGold}`}
-                width={280}
-                height={80}
-                className="h-20 w-auto object-contain"
+                width={600}
+                height={200}
+                className="h-48 w-auto object-contain"
+                quality={100}
                 priority
+                unoptimized
               />
             </Link>
 
