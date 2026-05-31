@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SiteSettings } from "@/lib/settings-defaults";
+import ImageUpload from "@/components/ImageUpload";
 
 type Tab = "branding" | "announcement" | "hero" | "stats" | "contact" | "theme" | "menu";
 
@@ -136,18 +137,41 @@ export default function AdminSettingsPage() {
         {tab === "branding" && (
           <div className="space-y-5">
             <h3 className="text-base font-bold text-gray-700 mb-4">Brand Identity</h3>
+
+            {/* Logo Upload */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+              <label className="block text-xs font-semibold text-gray-600 uppercase mb-3">
+                Store Logo
+              </label>
+              <div className="flex items-center gap-6">
+                <ImageUpload
+                  value={form.logoUrl}
+                  onChange={(v) => set("logoUrl", v)}
+                  size="lg"
+                  shape="square"
+                  placeholder="Logo URL ya upload karo"
+                />
+                <div className="text-xs text-gray-400 space-y-1">
+                  <p>• Recommended: PNG with transparent background</p>
+                  <p>• Width: 300–500px</p>
+                  <p>• Logo set hone pe navbar text hide ho jaayega</p>
+                  <p>• Remove karo toh store name text dikhega</p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <InputField
                 label="Store Name (part 1 — white text)"
                 value={form.storeName}
                 onChange={(v) => set("storeName", v)}
-                placeholder="e.g. JERAI"
+                placeholder="e.g. NEONFLEXX"
               />
               <InputField
                 label="Store Name (part 2 — gold text)"
                 value={form.storeNameGold}
                 onChange={(v) => set("storeNameGold", v)}
-                placeholder="e.g. FITNESS"
+                placeholder="e.g. STUDIO"
               />
             </div>
             <InputField
@@ -440,62 +464,91 @@ export default function AdminSettingsPage() {
           <div className="space-y-5">
             <h3 className="text-base font-bold text-gray-700 mb-1">Menu Categories</h3>
             <p className="text-sm text-gray-500">
-              These appear in the navbar and as filter pills on the homepage. Drag to reorder.
+              Categories appear in the navbar and as circular cards on the homepage. Add a name and a square image URL for each.
             </p>
-            <div className="space-y-2">
-              {form.categories.map((cat, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="text-gray-400 text-xs w-5 font-mono">{i + 1}.</span>
-                  <input
-                    value={cat}
-                    onChange={(e) => {
-                      const updated = [...form.categories];
-                      updated[i] = e.target.value;
-                      set("categories", updated);
-                    }}
-                    className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold"
-                  />
-                  <button
-                    onClick={() => {
-                      const updated = [...form.categories];
-                      updated.splice(i - 1, 2, updated[i], updated[i - 1]);
-                      set("categories", updated);
-                    }}
-                    disabled={i === 0}
-                    className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
-                    title="Move up"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => {
-                      const updated = [...form.categories];
-                      updated.splice(i, 2, updated[i + 1], updated[i]);
-                      set("categories", updated);
-                    }}
-                    disabled={i === form.categories.length - 1}
-                    className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
-                    title="Move down"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => set("categories", form.categories.filter((_, idx) => idx !== i))}
-                    className="text-red-400 hover:text-red-600 p-1"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
+
+            <div className="space-y-3">
+              {form.categories.map((cat, i) => {
+                const catObj = typeof cat === "string" ? { name: cat, image: "" } : cat;
+                return (
+                  <div key={i} className="flex items-start gap-2 bg-gray-50 border border-gray-200 rounded-lg p-3">
+                    {/* Inputs */}
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Category Name</label>
+                        <input
+                          value={catObj.name}
+                          placeholder="e.g. Gaming"
+                          onChange={(e) => {
+                            const updated = [...form.categories];
+                            updated[i] = { ...catObj, name: e.target.value };
+                            set("categories", updated);
+                          }}
+                          className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Category Image</label>
+                        <ImageUpload
+                          value={catObj.image}
+                          onChange={(url) => {
+                            const updated = [...form.categories];
+                            updated[i] = { ...catObj, image: url };
+                            set("categories", updated);
+                          }}
+                          size="sm"
+                          shape="circle"
+                          placeholder="https://... ya upload karo"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Move + Delete */}
+                    <div className="flex flex-col gap-1 shrink-0">
+                      <button
+                        onClick={() => {
+                          const updated = [...form.categories];
+                          updated.splice(i - 1, 2, updated[i], updated[i - 1]);
+                          set("categories", updated);
+                        }}
+                        disabled={i === 0}
+                        className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-20"
+                        title="Move up"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => {
+                          const updated = [...form.categories];
+                          updated.splice(i, 2, updated[i + 1], updated[i]);
+                          set("categories", updated);
+                        }}
+                        disabled={i === form.categories.length - 1}
+                        className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-20"
+                        title="Move down"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => set("categories", form.categories.filter((_, idx) => idx !== i))}
+                        className="p-1 text-red-400 hover:text-red-600"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
+
             <button
-              onClick={() => set("categories", [...form.categories, ""])}
+              onClick={() => set("categories", [...form.categories, { name: "", image: "" }])}
               className="text-sm text-gold font-semibold hover:underline flex items-center gap-1"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

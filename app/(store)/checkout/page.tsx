@@ -211,7 +211,10 @@ export default function CheckoutPage() {
             <p>Estimated delivery: <strong>3–5 business days</strong></p>
             <p className="mt-1">Delivering to: {form.address}, {form.city} — {form.pincode}</p>
           </div>
-          <Link href="/" className="block w-full btn-gold py-3 rounded-xl font-semibold text-center">
+          <Link href={`/track?id=${orderId}`} className="block w-full btn-gold py-3 rounded-xl font-semibold text-center mb-3">
+            Track My Order
+          </Link>
+          <Link href="/" className="block w-full border border-gray-200 py-3 rounded-xl font-semibold text-center text-gray-600 hover:bg-gray-50 transition-colors">
             Continue Shopping
           </Link>
         </div>

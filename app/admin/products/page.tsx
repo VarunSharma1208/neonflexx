@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Product } from "@/types";
+import ImageUpload from "@/components/ImageUpload";
 
 type CategoryTree = Record<string, Record<string, string[]>>;
 
@@ -335,38 +336,42 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="col-span-2">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-semibold text-gray-600">Images (URLs) * — first image is the main one</label>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                    Product Images * — first image is the main one
+                  </label>
                   <button type="button"
                     onClick={() => setForm({ ...form, images: [...form.images, ""] })}
-                    className="text-xs text-gold font-semibold hover:underline">
+                    className="text-xs text-gold font-semibold hover:underline flex items-center gap-1">
                     + Add Image
                   </button>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {form.images.map((url, i) => (
-                    <div key={i} className="flex gap-2 items-center">
-                      <input
+                    <div key={i} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-gray-500">
+                          {i === 0 ? "Main Image *" : `Image ${i + 1}`}
+                        </span>
+                        {form.images.length > 1 && (
+                          <button type="button"
+                            onClick={() => setForm({ ...form, images: form.images.filter((_, j) => j !== i) })}
+                            className="text-red-400 hover:text-red-600 text-xs font-semibold">
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      <ImageUpload
                         value={url}
-                        onChange={(e) => {
+                        onChange={(newUrl) => {
                           const updated = [...form.images];
-                          updated[i] = e.target.value;
+                          updated[i] = newUrl;
                           setForm({ ...form, images: updated });
                         }}
+                        size="md"
+                        shape="square"
                         placeholder={i === 0 ? "Main image URL *" : `Image ${i + 1} URL`}
-                        className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gold"
                       />
-                      {url && (
-                        <div className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden shrink-0 bg-gray-50">
-                          <Image src={url} alt="" fill className="object-cover" sizes="40px"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                        </div>
-                      )}
-                      {form.images.length > 1 && (
-                        <button type="button"
-                          onClick={() => setForm({ ...form, images: form.images.filter((_, j) => j !== i) })}
-                          className="text-red-400 hover:text-red-600 shrink-0 text-lg leading-none">×</button>
-                      )}
                     </div>
                   ))}
                 </div>

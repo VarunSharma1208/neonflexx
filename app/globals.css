@@ -1,40 +1,89 @@
 @import "tailwindcss";
 
 :root {
-  --gold: #cc1111;
-  --gold-dark: #aa0e0e;
-  --gold-light: #ffd5d5;
-  --dark-bg: #0a0a0a;
+  --neon: #00d4ff;
+  --neon-dark: #00a8cc;
+  --neon-glow: rgba(0, 212, 255, 0.6);
+  --neon-soft: rgba(0, 212, 255, 0.15);
+  --dark-bg: #050505;
+  --card-bg: #0d0d0d;
+  --border: rgba(0, 212, 255, 0.2);
+
+  /* keep gold as alias so existing classes still work */
+  --gold: #00d4ff;
+  --gold-dark: #00a8cc;
+  --gold-light: rgba(0, 212, 255, 0.15);
 }
 
 @theme inline {
-  --color-gold: var(--gold);
-  --color-gold-dark: var(--gold-dark);
-  --color-gold-light: var(--gold-light);
+  --color-gold: var(--neon);
+  --color-gold-dark: var(--neon-dark);
+  --color-gold-light: rgba(0, 212, 255, 0.15);
 }
 
 body {
-  background: #ffffff;
-  color: #1a1a1a;
+  background: var(--dark-bg);
+  color: #e0e0e0;
   font-family: "Segoe UI", Arial, Helvetica, sans-serif;
 }
 
-.gold-text { color: var(--gold); }
-.gold-bg { background-color: var(--gold); }
-.gold-border { border-color: var(--gold); }
+/* ── Neon text / bg / border ── */
+.gold-text  { color: var(--neon); }
+.gold-bg    { background-color: var(--neon); }
+.gold-border{ border-color: var(--neon); }
 
+/* ── Primary button ── */
 .btn-gold {
-  background-color: var(--gold);
-  color: #ffffff;
+  background: transparent;
+  color: var(--neon);
   font-weight: 700;
-  letter-spacing: 0.05em;
-  transition: background-color 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.08em;
+  border: 1.5px solid var(--neon);
+  box-shadow: 0 0 10px var(--neon-glow), inset 0 0 10px rgba(0,212,255,0.05);
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
 }
 .btn-gold:hover {
-  background-color: var(--gold-dark);
-  box-shadow: 0 0 18px rgba(204, 17, 17, 0.5);
+  background: var(--neon);
+  color: #000;
+  box-shadow: 0 0 24px var(--neon-glow), 0 0 48px rgba(0,212,255,0.3);
 }
 
+/* ── Neon text glow ── */
 .neon-glow {
-  text-shadow: 0 0 10px rgba(204, 17, 17, 0.8), 0 0 28px rgba(204, 17, 17, 0.4);
+  text-shadow:
+    0 0 8px var(--neon),
+    0 0 20px var(--neon-glow),
+    0 0 40px rgba(0, 212, 255, 0.3);
 }
+
+/* ── Neon flicker animation for hero ── */
+@keyframes neon-flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96%            { opacity: 0.85; }
+  97%            { opacity: 1; }
+  98%            { opacity: 0.9; }
+}
+.neon-flicker { animation: neon-flicker 4s infinite; }
+
+/* ── Card glow on hover ── */
+.neon-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.neon-card:hover {
+  border-color: var(--neon);
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.2);
+}
+
+/* ── Input focus ── */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--neon) !important;
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2) !important;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: var(--neon-dark); border-radius: 3px; }
